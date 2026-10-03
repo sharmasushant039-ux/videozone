@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VideoZone</title>
+<style>
+:root{--bg:#0b0c10;--surface:#15171f;--surface2:#1d2029;--border:#2a2e3a;--text:#f4f5f8;--muted:#9aa1b2;--accent:#ff3b5c;--accent-d:#d62747;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}[hidden]{display:none!important}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(11,12,16,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.nav-in{max-width:1280px;margin:auto;padding:14px 5%;display:flex;align-items:center;gap:24px}
+.logo{font-size:24px;font-weight:800;color:var(--accent);white-space:nowrap;cursor:pointer}
+.links{display:flex;gap:20px}.links a{color:var(--muted);font-size:15px;transition:color .2s;cursor:pointer}.links a:hover{color:var(--text)}
+.search{flex:1;max-width:460px;margin-left:auto}
+.search input{width:100%;padding:11px 18px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;transition:.2s}
+.search input:focus{border-color:var(--accent);background:var(--surface2)}
+.burger{display:none;background:none;border:0;cursor:pointer;padding:6px}
+.burger i{display:block;width:24px;height:2px;background:var(--text);margin:5px 0;transition:.25s}
+.burger.on i:nth-child(1){transform:translateY(7px) rotate(45deg)}.burger.on i:nth-child(2){opacity:0}.burger.on i:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+main{max-width:1280px;margin:auto;padding:28px 5% 60px}
+.hero{position:relative;min-height:380px;border-radius:22px;overflow:hidden;display:flex;align-items:flex-end;padding:44px;margin-bottom:28px;border:1px solid var(--border)}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(11,12,16,.95) 5%,rgba(11,12,16,.3) 65%,rgba(11,12,16,.05))}
+.hero-c{position:relative;max-width:620px}
+.hero h1{font-size:clamp(30px,5.5vw,54px);line-height:1.1;margin-bottom:12px;letter-spacing:-1px}
+.hero p{color:#cfd3de;font-size:17px;margin-bottom:22px}
+.btn{background:var(--accent);color:#fff;border:0;padding:12px 26px;border-radius:999px;font-size:16px;font-weight:600;cursor:pointer;transition:.2s}
+.btn:hover{background:var(--accent-d);transform:scale(1.04)}.btn:disabled{opacity:.6}
+.btn2{background:transparent;color:var(--text);border:1px solid var(--border);padding:10px 18px;border-radius:999px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+.btn2:hover{border-color:var(--accent)}.btn2.del:hover{border-color:#ff5d5d;color:#ff5d5d}
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px}
+.chip{background:var(--surface);color:#d7dbe5;border:1px solid var(--border);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;transition:.2s}
+.chip:hover{border-color:var(--accent)}.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+section{margin-bottom:44px}h2.t{font-size:22px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:.25s}
+.card:hover,.card:focus-visible{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 12px 28px rgba(255,59,92,.15)}
+.thumb{position:relative;aspect-ratio:16/9;overflow:hidden;display:grid;place-items:center}
+.thumb .ini{font-size:54px;font-weight:800;color:rgba(255,255,255,.25);letter-spacing:-2px}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.card:hover .thumb img{transform:scale(1.06)}
+.card:hover .pi,.card:focus-visible .thumb video.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;opacity:0;transition:opacity .25s;pointer-events:none}.thumb video.preview.show{opacity:1}
+.cb{padding:15px}.cb h3{font-size:17px;margin-bottom:8px}
+.badge{display:inline-block;background:rgba(255,59,92,.15);color:#ff8fa3;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:600}
+.cd{color:var(--muted);font-size:14px;margin-top:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card:hover .empty{text-align:center;padding:60px 20px;color:var(--muted)}.empty b{display:block;font-size:48px}.empty h3{color:var(--text);font-size:22px}
+footer{text-align:center;color:#7e8594;padding:28px 15px;border-top:1px solid var(--border);font-size:14px}
+.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.85);display:grid;place-items:center;padding:16px;overflow-y:auto;animation:f .2s}
+.mb{position:relative;width:100%;max-width:960px;background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;animation:p .25s}
+.vw{position:relative;background:#000}.vw video{width:100%;aspect-ratio:16/9;display:block}
+.verr{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted);font-size:14px;background:#000}
+.x{position:absolute;top:10px;right:10px;z-index:2;width:38px;height:38px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:18px;cursor:pointer}.x:hover{background:var(--accent)}
+.mi{padding:20px 24px 26px}.mi h2{font-size:24px;margin-bottom:10px}.meta{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:14px;margin-bottom:12px}.mi p{color:#c9cddb}
+@keyframes f{from{opacity:0}}@keyframes p{from{opacity:0;transform:scale(.96)}}
+/* admin */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px}.panel h2{font-size:20px;margin-bottom:18px}
+.fld{margin-bottom:16px}.fld label{display:block;font-size:14px;color:var(--muted);margin-bottom:6px}
+.fld input[type=text],.fld textarea,.fld select{width:100%;padding:11px 14px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:15px;outline:none}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--accent)}
+.chk{display:flex;gap:10px;align-items:center;margin-bottom:18px;cursor:pointer}.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:680px}
+th{text-align:left;font-size:13px;color:var(--muted);padding:10px;border-bottom:1px solid var(--border)}
+td{padding:10px;border-bottom:1px solid var(--border);font-size:15px;vertical-align:middle}tr:hover td{background:var(--surface2)}
+.mini{width:88px;aspect-ratio:16/9;border-radius:8px}.yes{color:#5be08a;font-weight:600}.no{color:var(--muted)}
+.acts{display:flex;gap:8px}.acts .btn2{padding:6px 14px;font-size:14px}
+.note{background:rgba(255,59,92,.1);border:1px solid rgba(255,59,92,.35);border-radius:12px;padding:12px 16px;margin-bottom:24px;color:#ffc2cc;font-size:14px}
+.toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);padding:12px 22px;border-radius:999px;z-index:200}
+@media(max-width:900px){.hero{min-height:320px;padding:32px}}
+@media(max-width:700px){.nav-in{flex-wrap:wrap;gap:12px}.search{order:3;flex-basis:100%;max-width:none;margin-left:0}.burger{display:block;margin-left:auto}
+.links{display:none;order:4;flex-basis:100%;flex-direction:column;gap:0;border-top:1px solid var(--border)}.links.on{display:flex}.links a{padding:12px 4px;font-size:16px}
+.hero{min-height:280px;padding:24px 20px}.grid{grid-template-columns:1fr}.mi{padding:16px 18px 22px}.panel{padding:18px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="nav"><div class="nav-in">
+  <div class="logo" id="logo"></div>
+  <nav class="links" id="links">
+    <a data-go="top">Home</a><a data-go="featured">Featured</a><a data-go="latest">Latest</a><a id="adminLink">Admin</a>
+  </nav>
+  <div class="search" id="searchBox"><input id="q" type="search" placeholder="Search videos..." autocomplete="off" aria-label="Search videos"></div>
+  <button class="burger" id="burger" aria-label="Menu"><i></i><i></i><i></i></button>
+</div></header>
+<main id="app"></main>
+<footer id="foot"></footer>
+<div class="modal" id="modal" hidden><div class="mb">
+  <button class="x" id="mx" aria-label="Close">✕</button>
+  <div class="vw"><video id="vid" controls playsinline></video><div class="verr" id="verr" hidden>This preview can't load outside videos. In the real project (npm start) the video plays here.</div></div>
+  <div class="mi"><h2 id="mt"></h2><div class="meta"><span class="badge" id="mc"></span><span id="md"></span></div><p id="mp"></p></div>
+</div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+// ===== Settings (in the real project these live in public/config.js) =====
+const SITE={name:"VideoZone",logo:"▶",cats:["Animation","Entertainment","Travel","Cars"]};
+const B="https://storage.googleapis.com/gtv-videos-bucket/sample/";
+const seed=[
+["Big Buck Bunny","A giant rabbit takes on three bullying rodents in this classic Blender animation.","Animation","BigBuckBunny",1],
+["Elephants Dream","Two strange characters explore a surreal machine world in the first open movie.","Animation","ElephantsDream",1],
+["Sintel","A young woman searches for her lost dragon in this fantasy short film.","Animation","Sintel",1],
+["Tears of Steel","A sci-fi short about warriors and scientists trying to save the world.","Entertainment","TearsOfSteel",1],
+["For Bigger Blazes","A short, high-energy clip full of color and fire.","Entertainment","ForBiggerBlazes",0],
+["For Bigger Escapes","Pack your bags: a quick clip about getting away from it all.","Travel","ForBiggerEscapes",0],
+["For Bigger Joyrides","Hit the open road in this short travel clip.","Travel","ForBiggerJoyrides",0],
+["Subaru Outback: Street and Dirt","How the Subaru Outback handles city streets and rough dirt roads.","Cars","SubaruOutbackOnStreetAndDirt",0],
+["Volkswagen GTI Review","A quick look at what makes the Volkswagen GTI fun to drive.","Cars","VolkswagenGTIReview",0]
+].map((s,i)=>({id:i+1,title:s[0],description:s[1],category:s[2],thumbnail:"",videoUrl:B+s[3]+".mp4",featured:!!s[4],dateAdded:new Date(Date.now()-(i+1)*864e5).toISOString()}));
+
+// ===== Storage: demo database in the browser (real project uses SQLite) =====
+let videos;
+try{videos=JSON.parse(localStorage.getItem("vz"))}catch(e){}
+if(!Array.isArray(videos))videos=seed;
+const save=()=>{try{localStorage.setItem("vz",JSON.stringify(videos))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=t=>{const d=document.createElement("div");d.textContent=t??"";return d.innerHTML};
+const fmt=s=>new Date(s).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"});
+const newest=()=>[...videos].sort((a,b)=>new Date(b.dateAdded)-new Date(a.dateAdded));
+function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2500)}
+
+// Thumbnail: uses the thumbnail URL if it loads, otherwise a generated gradient
+function thumb(v,cls="thumb",icon=true){
+  const h=(330+v.id*37)%360,ini=v.title.trim().slice(0,1).toUpperCase();
+  return `<div class="${cls}" style="background:linear-gradient(135deg,hsl(${h} 65% 34%),hsl(${(h+50)%360} 55% 14%))"><span class="ini">${esc(ini)}</span>${v.thumbnail?`<img src="${esc(v.thumbnail)}" alt="" onerror="this.remove()">`:""}</div>`;
+}
+const card=v=>`<article class="card" tabindex="0" data-id="${v.id}" role="button" aria-label="Play ${esc(v.title)}">${thumb(v)}<div class="cb"><h3>${esc(v.title)}</h3><span class="badge">${esc(v.category)}</span><p class="cd">${esc(v.description)}</p></div></article>`;
+
+// ===== Website view =====
+let cat="All";
+function site(){
+  $("searchBox").hidden=false;
+  const list=newest(),hero=list.find(v=>v.featured)||list[0];
+  const h=hero?(330+hero.id*37)%360:340;
+  $("app").innerHTML=`
+  <section class="hero" id="top" style="margin-bottom:28px;background:linear-gradient(135deg,hsl(${h} 65% 30%),hsl(${(h+50)%360} 55% 12%))">
+    <div class="hero-c"><h1>${esc(hero?hero.title:"Watch something great today")}</h1><p>${esc(hero?hero.description:"Stream the latest videos, anytime, on any device.")}</p>${hero?`<button class="btn" data-play="${hero.id}">▶ Play now</button>`:""}</div></section>
+  <div class="filters">${["All",...SITE.cats].map(c=>`<button class="chip ${c===cat?"on":""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}</div>
+  <div id="results"></div>`;
+  results();
+}
+function results(){
+  stopPreview();
+  const q=$("q").value.toLowerCase().trim(),list=newest(),filtering=q||cat!=="All";
+  const m=list.filter(v=>v.title.toLowerCase().includes(q)&&(cat==="All"||v.category===cat));
+  const r=$("results");
+  if(filtering){
+    r.innerHTML=m.length?`<section><h2 class="t">${m.length} video${m.length>1?"s":""} found</h2><div class="grid">${m.map(card).join("")}</div></section>`
+      :`<div class="empty"><b>🎬</b><h3>No videos found</h3><p>Try a different search or pick another category.</p></div>`;
+  }else{
+    const f=list.filter(v=>v.featured);
+    r.innerHTML=(f.length?`<section id="featured"><h2 class="t">Featured videos</h2><div class="grid">${f.map(card).join("")}</div></section>`:"")
+      +(list.length?`<section id="latest"><h2 class="t">Latest videos</h2><div class="grid">${list.slice(0,8).map(card).join("")}</div></section>`
+      :`<div class="empty"><b>🎬</b><h3>No videos yet</h3><p>Add one from the admin dashboard.</p></div>`);
+  }
+}
+
+// ===== Admin view =====
+let editId=null;
+function admin(){
+  $("searchBox").hidden=true;
+  const v=videos.find(x=>x.id===editId)||{title:"",description:"",category:SITE.cats[0],thumbnail:"",videoUrl:"",featured:false};
+  const cats=SITE.cats.includes(v.category)?SITE.cats:[...SITE.cats,v.category];
+  $("app").innerHTML=`
+  <div class="note"><b>Preview mode.</b> This demo saves changes in your browser only. In the real project they are saved in the SQLite database.</div>
+  <div class="panel"><h2>${editId?"Edit video #"+editId:"Add a new video"}</h2>
+   <form id="f">
+    <div class="fld"><label>Title *</label><input type="text" id="ft" required maxlength="120" value="${esc(v.title)}"></div>
+    <div class="fld"><label>Description</label><textarea id="fd" rows="3" maxlength="500">${esc(v.description)}</textarea></div>
+    <div class="fld"><label>Category</label><select id="fc">${cats.map(c=>`<option ${c===v.category?"selected":""}>${esc(c)}</option>`).join("")}</select></div>
+    <div class="fld"><label>Thumbnail URL (optional)</label><input type="text" id="fh" placeholder="https://example.com/picture.jpg" value="${esc(v.thumbnail)}"></div>
+    <div class="fld"><label>Video URL *</label><input type="text" id="fv" required placeholder="https://example.com/video.mp4" value="${esc(v.videoUrl)}"></div>
+    <label class="chk"><input type="checkbox" id="ff" ${v.featured?"checked":""}> Mark as featured</label>
+    <div class="acts"><button class="btn" type="submit">${editId?"Save changes":"Add video"}</button>${editId?'<button type="button" class="btn2" id="cx">Cancel edit</button>':""}</div>
+   </form></div>
+  <div class="panel"><h2>All videos (${videos.length})</h2><div class="tw"><table>
+   <thead><tr><th>ID</th><th>Thumbnail</th><th>Title</th><th>Category</th><th>Featured</th><th>Date added</th><th>Actions</th></tr></thead>
+   <tbody>${newest().map(x=>`<tr><td>${x.id}</td><td>${thumb(x,"thumb mini",false)}</td><td>${esc(x.title)}</td><td>${esc(x.category)}</td><td class="${x.featured?"yes":"no"}">${x.featured?"Yes":"No"}</td><td>${fmt(x.dateAdded)}</td>
+   <td><div class="acts"><button class="btn2" data-edit="${x.id}">Edit</button><button class="btn2 del" data-del="${x.id}">Delete</button></div></td></tr>`).join("")}</tbody></table></div>
+   ${videos.length?"":'<p class="empty">No videos yet. Add your first video above.</p>'}</div>`;
+  $("f").onsubmit=e=>{e.preventDefault();
+    const d={title:$("ft").value.trim(),description:$("fd").value.trim(),category:$("fc").value,thumbnail:$("fh").value.trim(),videoUrl:$("fv").value.trim(),featured:$("ff").checked};
+    if(editId){Object.assign(videos.find(x=>x.id===editId),d);toast("Changes saved")}
+    else{videos.push({id:Math.max(0,...videos.map(x=>x.id))+1,...d,dateAdded:new Date().toISOString()});toast("Video added")}
+    editId=null;save();admin();};
+  if($("cx"))$("cx").onclick=()=>{editId=null;admin()};
+}
+
+// ===== Player =====
+function play(id){
+  const v=videos.find(x=>x.id===Number(id));if(!v)return;
+  stopPreview();hoverCard=null;
+  const el=$("vid");$("verr").hidden=true;el.src=v.videoUrl;
+  $("mt").textContent=v.title;$("mc").textContent=v.category;$("md").textContent="Added "+fmt(v.dateAdded);$("mp").textContent=v.description;
+  $("modal").hidden=false;document.body.style.overflow="hidden";el.play().catch(()=>{});
+}
+function closeP(){const el=$("vid");el.pause();el.removeAttribute("src");el.load();$("modal").hidden=true;document.body.style.overflow=""}
+$("vid").addEventListener("error",()=>{$("verr").hidden=false});
+
+// ---------- Hover preview: muted clip that plays while the mouse is on a card ----------
+// Only one preview plays at a time. Moving the mouse away stops it, resets it
+// and shows the thumbnail again. Touch screens have no hover, so they skip this.
+const PREVIEW_SECONDS = 8;   // how long the preview plays before it loops (5-10 works well)
+const PREVIEW_DELAY = 350;   // milliseconds the mouse must rest on a card before the preview starts
+const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+let hoverCard = null;        // the card the mouse is currently over
+let hoverTimer = null;       // waits PREVIEW_DELAY before starting
+let previewEl = null;        // the one preview <video> that exists right now
+
+function startPreview(card) {
+  const video = videos.find((v) => v.id === Number(card.dataset.id));
+  const thumb = card.querySelector(".thumb");
+  if (!video || !thumb) return;
+
+  const el = document.createElement("video");
+  el.className = "preview";
+  el.muted = true;             // previews are always silent (also needed for autoplay)
+  el.defaultMuted = true;
+  el.loop = true;
+  el.playsInline = true;
+  el.preload = "auto";
+  el.src = video.videoUrl;
+  thumb.appendChild(el);       // sits on top of the thumbnail
+  previewEl = el;
+
+  // For long videos, skip the intro and start 25% of the way in
+  let startAt = 0;
+  el.addEventListener("loadedmetadata", () => {
+    if (el.duration > 40) { startAt = el.duration * 0.25; el.currentTime = startAt; }
+  });
+  // Fade the video in only once it is really playing (no blank flash)
+  el.addEventListener("playing", () => { if (el === previewEl) el.classList.add("show"); });
+  // Jump back to the start of the preview after PREVIEW_SECONDS
+  el.addEventListener("timeupdate", () => {
+    if (el.currentTime - startAt >= PREVIEW_SECONDS) el.currentTime = startAt;
+  });
+  // If the video can't load, just keep showing the thumbnail
+  el.addEventListener("error", () => { if (el === previewEl) stopPreview(); });
+  el.play().catch(() => { if (el === previewEl) stopPreview(); });
+}
+
+function stopPreview() {
+  clearTimeout(hoverTimer);
+  const el = previewEl;
+  previewEl = null;
+  if (!el) return;
+  el.classList.remove("show");   // fade back to the thumbnail
+  el.pause();
+  el.removeAttribute("src");     // reset: stops downloading
+  el.load();
+  setTimeout(() => el.remove(), 250);
+}
+
+if (canHover) {
+  document.addEventListener("mouseover", (e) => {
+    const card = e.target.closest(".card");
+    if (card === hoverCard) return;           // still on the same card
+    stopPreview();                            // left the old card -> stop its preview
+    hoverCard = card;
+    if (card && $("modal").hidden) hoverTimer = setTimeout(() => startPreview(card), PREVIEW_DELAY);
+  });
+  // Mouse left the browser window, or the tab was hidden
+  document.documentElement.addEventListener("mouseleave", () => { stopPreview(); hoverCard = null; });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) { stopPreview(); hoverCard = null; } });
+}
+
+// ===== Events =====
+document.addEventListener("click",e=>{
+  const t=e.target,c=t.closest(".card");
+  if(t.dataset.play)return play(t.dataset.play);
+  if(c)return play(c.dataset.id);
+  if(t.dataset.cat){cat=t.dataset.cat;document.querySelectorAll(".chip").forEach(b=>b.classList.toggle("on",b.dataset.cat===cat));results()}
+  if(t.dataset.edit){editId=Number(t.dataset.edit);admin();scrollTo({top:0,behavior:"smooth"})}
+  if(t.dataset.del){const v=videos.find(x=>x.id===Number(t.dataset.del));if(confirm(`Delete "${v.title}"?`)){videos=videos.filter(x=>x!==v);save();toast("Video deleted");admin()}}
+  if(t.dataset.go){$("links").classList.remove("on");$("burger").classList.remove("on");location.hash="";site();const s=$(t.dataset.go);s&&s.scrollIntoView({behavior:"smooth"})}
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&e.target.classList.contains("card"))play(e.target.dataset.id);
+  if(e.key==="Escape"&&!$("modal").hidden)closeP();
+});
+$("mx").onclick=closeP;$("modal").onclick=e=>{if(e.target.id==="modal")closeP()};
+$("q").oninput=()=>{if(location.hash!=="#/admin")results()};
+$("burger").onclick=()=>{$("links").classList.toggle("on");$("burger").classList.toggle("on")};
+$("adminLink").onclick=()=>{location.hash="#/admin";$("links").classList.remove("on");$("burger").classList.remove("on")};
+$("logo").onclick=()=>{location.hash=""};
+function route(){stopPreview();hoverCard=null;editId=null;location.hash==="#/admin"?admin():site();scrollTo(0,0)}
+addEventListener("hashchange",route);
+
+$("logo").textContent=`${SITE.logo} ${SITE.name}`;
+$("foot").textContent=`${SITE.name} © ${new Date().getFullYear()}`;
+route();
+</script>
+</body>
+</html>
